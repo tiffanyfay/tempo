@@ -10,6 +10,7 @@ import (
 	"github.com/grafana/tempo/modules/frontend/pipeline"
 	v1 "github.com/grafana/tempo/modules/frontend/v1"
 	"github.com/grafana/tempo/pkg/usagestats"
+	"github.com/grafana/tempo/pkg/util"
 )
 
 var statVersion = usagestats.NewString("frontend_version")
@@ -80,7 +81,7 @@ type SLOConfig struct {
 	ThroughputBytesSLO float64       `yaml:"throughput_bytes_slo,omitempty"`
 }
 
-func (cfg *Config) RegisterFlagsAndApplyDefaults(string, *flag.FlagSet) {
+func (cfg *Config) RegisterFlagsAndApplyDefaults(prefix string, f *flag.FlagSet) {
 	slo := SLOConfig{
 		DurationSLO:        0,
 		ThroughputBytesSLO: 0,
@@ -140,6 +141,8 @@ func (cfg *Config) RegisterFlagsAndApplyDefaults(string, *flag.FlagSet) {
 	// enable multi tenant queries by default
 	cfg.MultiTenantQueriesEnabled = true
 	cfg.Metrics.MaxIntervals = 10_000
+
+	f.BoolVar(&cfg.MCPServer.Enabled, util.PrefixConfig(prefix, "mcp-server.enabled"), false, "Enable Tempo MCP server.")
 }
 
 type CortexNoQuerierLimits struct{}
